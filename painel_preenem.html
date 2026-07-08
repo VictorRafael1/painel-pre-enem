@@ -248,6 +248,13 @@
     border-color:var(--border) !important;
   }
   .leaflet-control-zoom a:hover{ background:var(--surface) !important; }
+  .leaflet-tooltip.municipio-tooltip{
+    background:var(--surface-2); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; box-shadow:0 4px 14px rgba(0,0,0,.35);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:12px;
+    padding:5px 9px;
+  }
+  .leaflet-tooltip.municipio-tooltip::before{ border-top-color:var(--border); }
   .map-legend{
     display:flex; gap:16px; flex-wrap:wrap; margin-top:14px;
     font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono',monospace;
@@ -640,6 +647,7 @@ function renderMap(d){
         `<b>${nome}</b><br>${fmtInt(acoes)} ação(ões) registrada(s)` +
         (alunos>0 ? `<br>${fmtInt(alunos)} alunos/pessoas atendidas` : '')
       );
+      layer.bindTooltip(nome, {sticky:true, direction:'top', offset:[0,-4], className:'municipio-tooltip'});
       layer.on('mouseover', ()=>{ layer.setStyle({weight:2.5, color:'#F2B705'}); layer.bringToFront(); });
       layer.on('mouseout', ()=>{ layer.setStyle({weight:1, color:'#0A0F1C'}); });
       layer.on('click', ()=>{
