@@ -453,16 +453,29 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function looseName(s){
+  // remove conectores (do/da/dos/das/de) e o sufixo redundante "Piauí" para
+  // casar abreviações comuns da planilha (ex.: "Porto Alegre" -> "Porto Alegre do Piauí")
+  return normName(s)
+    .replace(/\b(do|da|dos|das|de)\b/g,' ')
+    .replace(/\bpiaui\b/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
 const GEOCODE_INDEX = {};
-MUNICIPIOS_PI.forEach(m=>{ GEOCODE_INDEX[normName(m[0])] = {nome:m[0], lat:m[1], lng:m[2]}; });
+const GEOCODE_INDEX_LOOSE = {};
+MUNICIPIOS_PI.forEach(m=>{
+  const geo = {nome:m[0], lat:m[1], lng:m[2]};
+  GEOCODE_INDEX[normName(m[0])] = geo;
+  GEOCODE_INDEX_LOOSE[looseName(m[0])] = geo;
+});
 
 function matchMunicipio(token){
   const nt = normName(token);
   if(!nt) return null;
   if(GEOCODE_INDEX[nt]) return GEOCODE_INDEX[nt];
-  for(const key in GEOCODE_INDEX){
-    if(key.startsWith(nt) || nt.startsWith(key)) return GEOCODE_INDEX[key];
-  }
+  const lt = looseName(token);
+  if(lt && GEOCODE_INDEX_LOOSE[lt]) return GEOCODE_INDEX_LOOSE[lt];
   return null;
 }
 function extractGRE(token){
