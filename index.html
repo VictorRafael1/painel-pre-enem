@@ -480,8 +480,8 @@ function matchMunicipio(token){
 }
 function extractGRE(token){
   // normaliza "20ª GRE", "GRE 20", "20ª" -> "20ª GRE"
-  const m = token.match(/(\d{1,2})\s*ª/);
-  if(m) return m[1] + 'ª GRE';
+  const m = String(token).match(/(\d{1,2})/);
+  if(m){ const n = parseInt(m[1],10); if(n>=1 && n<=21) return n + 'ª GRE'; }
   return null;
 }
 
@@ -553,7 +553,8 @@ function processWorkbook(wb){
       }
       if(idxGRE>=0){
         splitMulti(row[idxGRE]).forEach(tok=>{
-          const g = extractGRE(tok) || tok;
+          const g = extractGRE(tok);
+          if(!g) return;   // ignora valores que não são uma das 21 GREs
           gres.add(g); gresSet.add(g);
           rowGres.push(g);
           globalGRE[g] = (globalGRE[g]||0)+1;
